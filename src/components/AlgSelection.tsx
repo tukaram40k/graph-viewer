@@ -6,16 +6,38 @@ type Props = {
 };
 
 const AlgSelection: React.FC<Props> = ({ onSelectType }) => {
+  // card contents
   const cards = [
-    { title: 'Search Algorithm', type: 'search' },
-    { title: 'Minimal Tree', type: 'tree' },
-    { title: 'Shortest Path', type: 'shortest' },
+    {
+      title: 'Tree Search',
+      type: 'tree-search',
+      desc: 'Breadth-first search, Depth-first search',
+      imgSrc: 'src/assets/card-images/bfsdfs.png'
+    },
+    {
+      title: 'Minimal Spanning Tree',
+      type: 'minimal-tree',
+      desc: 'Prim and Kruskal algorithms',
+      imgSrc: 'src/assets/card-images/prim.png'
+    },
+    {
+      title: 'Shortest Path',
+      type: 'shortest-path',
+      desc: 'Dijkstra and Floyd-Warshall algorithms',
+      imgSrc: 'src/assets/card-images/dijk.png'
+    },
   ];
 
   return (
     <div className="card-grid">
       {cards.map((card) => (
-        <Card key={card.type} title={card.title} onClick={() => onSelectType(card.type)} />
+        <Card
+          key={card.type}
+          title={card.title}
+          desc={card.desc}
+          img={card.imgSrc}
+          onClick={() => onSelectType(card.type)}
+        />
       ))}
     </div>
   );
