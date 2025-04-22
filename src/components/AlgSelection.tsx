@@ -18,7 +18,7 @@ const AlgSelection: React.FC<Props> = ({ onSelectType }) => {
       title: 'Minimal Spanning Tree',
       type: 'minimal-tree',
       desc: 'Prim and Kruskal algorithms',
-      imgSrc: 'src/assets/card-images/prim.png'
+      imgSrc: 'src/assets/card-images/prim2.png'
     },
     {
       title: 'Shortest Path',

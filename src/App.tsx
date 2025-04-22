@@ -8,7 +8,9 @@ const App: React.FC = () => {
   return (
     <div className="app-container">
       <Header />
-      <GraphArea selectedType={selectedAlgType} onSelectType={setSelectedAlgType} />
+      <div className="workspace-container">
+        <GraphArea selectedType={selectedAlgType} onSelectType={setSelectedAlgType} />
+      </div>
     </div>
   );
 };
