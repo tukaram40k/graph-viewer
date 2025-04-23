@@ -4,9 +4,6 @@
 /* === Animation UI === */
 .back-button {
     @include Button($button-color-primary, $button-color-hover);
-
-    margin-bottom: 16px;
-    padding: 10px 16px;
 }
 
 .animation-ui {

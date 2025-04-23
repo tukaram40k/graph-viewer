@@ -1,5 +1,6 @@
 import React from 'react';
 import Card from './Card';
+import Intro from './Introduction';
 
 type Props = {
   onSelectType: (type: string) => void;
@@ -29,17 +30,21 @@ const AlgSelection: React.FC<Props> = ({ onSelectType }) => {
   ];
 
   return (
-    <div className="card-grid">
-      {cards.map((card) => (
-        <Card
-          key={card.type}
-          title={card.title}
-          desc={card.desc}
-          img={card.imgSrc}
-          onClick={() => onSelectType(card.type)}
-        />
-      ))}
+    <div className="ignore-me">
+      <Intro/>
+      <div className="card-grid">
+        {cards.map((card) => (
+          <Card
+            key={card.type}
+            title={card.title}
+            desc={card.desc}
+            img={card.imgSrc}
+            onClick={() => onSelectType(card.type)}
+          />
+        ))}
+      </div>
     </div>
+    
   );
 };
 
