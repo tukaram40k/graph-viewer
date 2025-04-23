@@ -1,0 +1,10 @@
+@use './variables' as *;
+
+body {
+    background-color: $bg-color-1;
+    background-image: url('../assets/bg1.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}

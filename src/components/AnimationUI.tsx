@@ -15,7 +15,12 @@ const DijkstraAnimation: React.FC<Props> = ({ type, onBack }) => {
   const [running, setRunning] = useState(false);
   const [animationSpeed, setAnimationSpeed] = useState(500);
   const [nodeCount, setNodeCount] = useState(20);
-  
+
+  let title: string = '';
+  if (type === 'shortest-path') {
+    title = 'Dijkstra\'s Algorithm'
+  }
+
   // Store references to simulation and animation state
   const simulationRef = useRef(null);
   const animationTimeoutRef = useRef(null);
@@ -514,8 +519,7 @@ const DijkstraAnimation: React.FC<Props> = ({ type, onBack }) => {
     <div className="dijkstra-container">
       <button className="back-button" onClick={onBack}>Back</button>
       <div className="animation-ui">
-        <h2>{type} Animation</h2>
-        
+        <h2>{title} Animation</h2>
         <div className="controls">
           <button onClick={toggleAlgorithm}>
             {running ? "Pause Algorithm" : "Start Algorithm"}

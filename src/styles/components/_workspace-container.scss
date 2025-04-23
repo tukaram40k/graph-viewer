@@ -1,0 +1,13 @@
+@use './variables' as *;
+
+.workspace-container {
+    max-width: 85vw;
+    margin-inline: auto;
+    margin-top: 25px;
+    background-color: rgba($bg-color-5, $bg-transparency);
+    
+    border-radius: $border-radius-main;
+    padding-top: 25px;
+    padding-bottom: 50px;
+    padding-inline: 50px; 
+}

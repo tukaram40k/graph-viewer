@@ -1,0 +1,7 @@
+@use './variables' as *;
+
+.intro {
+    margin-bottom: 25px;
+    color: $text-color-2;
+    font-size: 1.4rem;
+}
