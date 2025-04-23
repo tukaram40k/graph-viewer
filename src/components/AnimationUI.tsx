@@ -47,12 +47,12 @@ const DijkstraAnimation: React.FC<Props> = ({ type, onBack }) => {
 
   // Constants
   const COLORS = {
-    unvisitedNode: "#3498db",
-    currentNode: "#e74c3c",
-    visitedNode: "#2ecc71",
-    shortestPath: "#f39c12",
-    edge: "#95a5a6",
-    activeEdge: "#34495e",
+    unvisitedNode: "#48A6A7",
+    currentNode: "#313bc1",
+    visitedNode: "#6972e9",
+    shortestPath: "#AE445A",
+    edge: "#48A6A7",
+    activeEdge: "#6972e9",
     text: "white"
   };
 
@@ -308,7 +308,7 @@ const DijkstraAnimation: React.FC<Props> = ({ type, onBack }) => {
     // Update visualization
     updateVisualization();
     
-    setStatus("Ready to start Dijkstra's algorithm");
+    setStatus("Ready");
   };
 
   // Reset the algorithm
@@ -411,7 +411,7 @@ const DijkstraAnimation: React.FC<Props> = ({ type, onBack }) => {
     }
     
     const distance = state.distances[state.target];
-    setStatus(`Shortest path found! Distance: ${distance}`);
+    setStatus(`Shortest path found. Distance: ${distance}`);
     
     updateVisualization();
   };

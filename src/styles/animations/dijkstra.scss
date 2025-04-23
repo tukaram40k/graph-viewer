@@ -51,6 +51,8 @@ select {
     margin: 15px 0;
     flex-wrap: wrap;
     gap: 15px;
+    color: $text-color-2;
+    font-size: 1.2rem;
 }
 
 .legend-item {
@@ -66,8 +68,8 @@ select {
     border-radius: 50%;
 }
 
-.unvisited { background-color: #3498db; }
-.current { background-color: #e74c3c; }
-.visited { background-color: #2ecc71; }
-.path { background-color: #f39c12; }
-.active-edge { background-color: #34495e; }
+.unvisited { background-color: $graph-node-1; }
+.current { background-color: $graph-node-2; }
+.visited { background-color: $graph-node-3; }
+.path { background-color: $graph-node-4; }
+.active-edge { background-color: $graph-node-3; }

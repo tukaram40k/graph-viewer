@@ -1,10 +1,11 @@
 /* Additional styles for D3 elements */
 .node {
     cursor: pointer;
+    user-select: none;
 }
 
 .link {
-    stroke-opacity: 0.6;
+    stroke-opacity: 0.8;
 }
 
 .node text {
@@ -14,15 +15,17 @@
     fill: white;
     font-weight: bold;
     pointer-events: none;
+    user-select: none;
 }
 
 .weight-label {
     font-size: 12px;
     text-anchor: middle;
     dominant-baseline: middle;
-    fill: #333;
+    fill: #494e94;
     pointer-events: none;
     background-color: white;
+    user-select: none;
 }
 
 .graph-container {
