@@ -1,25 +1,41 @@
 @use './variables' as *;
+@use '../mixins/button' as *;
 
 /* === Animation UI === */
 .back-button {
+    @include Button($button-color-primary, $button-color-hover);
+
     margin-bottom: 16px;
     padding: 10px 16px;
-    background-color: #006A71;
-    color: white;
-    border: none;
-    border-radius: $border-radius-2;
-    cursor: pointer;
-
-    &:hover {
-        background-color: #48A6A7;
-    }
 }
 
 .animation-ui {
-    background-color: white;
-    border: 5px solid $bg-color-3;
+    text-align: center;
+    background-color: $bg-color-4;
     border-radius: $border-radius-2;
     padding: 24px;
     border-radius: $border-radius-main;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .graph-control-options {
+        text-align: left;
+        background-color: white;
+        border-radius: $border-radius-main;
+        padding: 10px;
+        padding-inline: 20px;
+        margin-bottom: 25px;
+    }
 }
+
+.status {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: $text-color-2;
+}
+
+svg {
+    border-radius: $border-radius-main;
+}
+

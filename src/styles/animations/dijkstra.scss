@@ -1,0 +1,73 @@
+@use '../mixins/button' as *;
+@use '../components/variables' as *;
+
+.dijkstra-container {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 20px;
+    text-align: left;
+    background-color: transparent;
+    border-radius: 8px;
+
+    h2 {
+        text-align: center;
+        color: $text-color-2;
+    }
+}
+
+.controls {
+    margin: 20px 0;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.dijkstra-container button {
+    @include Button($button-color-primary, $button-color-hover);
+    padding: 8px 16px;    
+    transition: background-color 0.3s;
+
+    &:disabled {
+        background-color: #95a5a6;
+        cursor: not-allowed;
+    }
+}
+
+select {
+    background-color: $bg-color-4;
+    color: $text-color-2;
+    padding: 8px;
+    border-radius: $border-radius-2;
+    border: 0px;
+    font-size: 1.2rem;
+
+    option {
+        border: 0px;
+        border-radius: $border-radius-2;
+    }
+}
+
+.legend {
+    display: flex;
+    margin: 15px 0;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+}
+
+.color-box {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border-radius: 50%;
+}
+
+.unvisited { background-color: #3498db; }
+.current { background-color: #e74c3c; }
+.visited { background-color: #2ecc71; }
+.path { background-color: #f39c12; }
+.active-edge { background-color: #34495e; }

@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
+import '../styles/animations/dijkstra.scss'
 import '../styles/animations/dijkstra.css'
 
 type Props = {
@@ -518,60 +519,58 @@ const DijkstraAnimation: React.FC<Props> = ({ type, onBack }) => {
   return (
     <div className="dijkstra-container">
       <button className="back-button" onClick={onBack}>Back</button>
+      <h2>{title} Animation</h2>
       <div className="animation-ui">
-        <h2>{title} Animation</h2>
-        <div className="controls">
-          <button onClick={toggleAlgorithm}>
-            {running ? "Pause Algorithm" : "Start Algorithm"}
-          </button>
-          <button onClick={resetAlgorithm}>Reset</button>
-          <button onClick={() => createRandomGraph(nodeCount)}>New Random Graph</button>
+        <div className="graph-control-options">
+          <div className="controls">
+            <button onClick={toggleAlgorithm}>
+              {running ? "Pause Algorithm" : "Start Algorithm"}
+            </button>
+            <button onClick={resetAlgorithm}>Reset</button>
+            <button onClick={() => createRandomGraph(nodeCount)}>New Random Graph</button>
+            
+            <select value={animationSpeed} onChange={handleSpeedChange}>
+              <option value="1000">Slow</option>
+              <option value="500">Medium</option>
+              <option value="200">Fast</option>
+              <option value="50">Very Fast</option>
+            </select>
+            
+            <select value={nodeCount} onChange={handleNodeCountChange}>
+              <option value="10">10 Nodes</option>
+              <option value="20">20 Nodes</option>
+              <option value="30">30 Nodes</option>
+              <option value="40">40 Nodes</option>
+            </select>
+          </div>
           
-          <select value={animationSpeed} onChange={handleSpeedChange}>
-            <option value="1000">Slow</option>
-            <option value="500">Medium</option>
-            <option value="200">Fast</option>
-            <option value="50">Very Fast</option>
-          </select>
-          
-          <select value={nodeCount} onChange={handleNodeCountChange}>
-            <option value="10">10 Nodes</option>
-            <option value="20">20 Nodes</option>
-            <option value="30">30 Nodes</option>
-            <option value="40">40 Nodes</option>
-          </select>
+          <div className="legend">
+            <div className="legend-item">
+              <div className="color-box unvisited"></div>
+              <span>Unvisited Node</span>
+            </div>
+            <div className="legend-item">
+              <div className="color-box current"></div>
+              <span>Current Node</span>
+            </div>
+            <div className="legend-item">
+              <div className="color-box visited"></div>
+              <span>Visited Node</span>
+            </div>
+            <div className="legend-item">
+              <div className="color-box path"></div>
+              <span>Shortest Path</span>
+            </div>
+            {/* <div className="legend-item">
+              <div className="color-box active-edge"></div>
+              <span>Edge Being Considered</span>
+            </div> */}
+          </div>
         </div>
         
-        <div className="legend">
-          <div className="legend-item">
-            <div className="color-box unvisited"></div>
-            <span>Unvisited Node</span>
-          </div>
-          <div className="legend-item">
-            <div className="color-box current"></div>
-            <span>Current Node</span>
-          </div>
-          <div className="legend-item">
-            <div className="color-box visited"></div>
-            <span>Visited Node</span>
-          </div>
-          <div className="legend-item">
-            <div className="color-box path"></div>
-            <span>Shortest Path</span>
-          </div>
-          <div className="legend-item">
-            <div className="color-box active-edge"></div>
-            <span>Edge Being Considered</span>
-          </div>
+        <div ref={containerRef} className="graph-container">
+          <div className="status">{status}</div>
         </div>
-        
-        <div className="status">{status}</div>
-        
-        <div 
-          ref={containerRef} 
-          className="graph-container" 
-          style={{ width: '100%', height: '600px', border: '1px solid #ddd', borderRadius: '4px' }}
-        ></div>
       </div>
     </div>
   );
