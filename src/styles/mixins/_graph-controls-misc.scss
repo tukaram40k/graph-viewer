@@ -1,0 +1,51 @@
+@use '../components/variables' as *;
+
+@mixin GraphControlsMisc {
+    h2 {
+        text-align: center;
+        color: $text-color-2;
+    }
+
+    .controls {
+        margin: 20px 0;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    
+    select {
+        background-color: $bg-color-4;
+        color: $text-color-2;
+        padding: 8px;
+        border-radius: $border-radius-2;
+        border: 0px;
+        font-size: 1.2rem;
+    
+        option {
+            border: 0px;
+            border-radius: $border-radius-2;
+        }
+    }
+    
+    .legend {
+        display: flex;
+        margin: 15px 0;
+        flex-wrap: wrap;
+        gap: 15px;
+        color: $text-color-2;
+        font-size: 1.2rem;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        margin-right: 10px;
+    }
+    
+    .color-box {
+        width: 20px;
+        height: 20px;
+        margin-right: 5px;
+        border-radius: 50%;
+    }
+}

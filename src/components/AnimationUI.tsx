@@ -1,5 +1,6 @@
 import React from 'react';
 import Dijkstra from './Dijkstra';
+import Prim from './Prim';
 
 type Props = {
   type: string;
@@ -11,7 +12,7 @@ const AnimationUI: React.FC<Props> = ({ type, onBack }) => {
     case 'tree-search': 
       return <div>bfs</div>
     case 'minimal-tree': 
-      return <div>prim</div>
+      return <Prim onBack={onBack}/>
     case 'shortest-path': 
       return <Dijkstra onBack={onBack}/>
     default:

@@ -2,7 +2,7 @@
 @use '../mixins/graph-controls-misc' as *;
 @use '../components/variables' as *;
 
-.dijkstra-container {
+.prim-container {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     padding: 20px;
     text-align: left;
@@ -13,7 +13,7 @@
         @include Button($button-color-primary, $button-color-hover);
         padding: 8px 16px;    
         transition: background-color 0.3s;
-    
+
         &:disabled {
             background-color: #95a5a6;
             cursor: not-allowed;

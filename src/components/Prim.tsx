@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
 import '../styles/animations/prim.scss'
-import '../styles/animations/prim.css'
+import '../styles/animations/d3.css'
 
 type Props = {
   onBack: () => void;

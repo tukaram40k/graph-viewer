@@ -1,4 +1,6 @@
-/* Additional styles for D3 elements */
+/* misc styles for d3 elements */
+/* separated from scss because of d3's unique properties */
+
 .node {
     cursor: pointer;
     user-select: none;
@@ -6,6 +8,7 @@
 
 .link {
     stroke-opacity: 0.8;
+    stroke-width: 3px;
 }
 
 .node text {
