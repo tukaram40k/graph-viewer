@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import Header from './components/Header';
 import GraphArea from './components/GraphArea';
+import BenchmarkSection from './components/charts/BenchmarkSection';
 
 const App: React.FC = () => {
   const [selectedAlgType, setSelectedAlgType] = useState<string | null>(null);
@@ -10,7 +11,9 @@ const App: React.FC = () => {
       <Header />
       <div className="workspace-container">
         <GraphArea selectedType={selectedAlgType} onSelectType={setSelectedAlgType} />
+        <BenchmarkSection/>
       </div>
+      
     </div>
   );
 };
