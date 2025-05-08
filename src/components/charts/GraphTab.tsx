@@ -1,3 +1,4 @@
+// components/GraphTab.tsx
 import React, { useEffect, useState } from 'react';
 import * as d3 from 'd3';
 import { runAlgorithmsOnGraph } from './utils/benchmarkUtils';
@@ -11,7 +12,18 @@ const GraphTab: React.FC<GraphTabProps> = ({ graphType }) => {
 
   useEffect(() => {
     const results = runAlgorithmsOnGraph(graphType);
-    setData(results);
+    const expandedResults: any[] = [];
+
+    results.forEach(entry => {
+      const { nodes, algorithm, time } = entry;
+      const algos = algorithm.split('+');
+      const timePerAlgo = time / algos.length;
+      algos.forEach(a => {
+        expandedResults.push({ algorithm: a, nodes, time: timePerAlgo });
+      });
+    });
+
+    setData(expandedResults);
   }, [graphType]);
 
   useEffect(() => {
@@ -28,8 +40,8 @@ const GraphTab: React.FC<GraphTabProps> = ({ graphType }) => {
     const height = +svg.attr('height') - margin.top - margin.bottom;
     const g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
 
-    const x = d3.scaleLinear().domain([0, d3.max(data, d => d.nodes)]).range([0, width]);
-    const y = d3.scaleLinear().domain([0, d3.max(data, d => d.time)]).range([height, 0]);
+    const x = d3.scaleLinear().domain([0, d3.max(data, d => d.nodes)!]).range([0, width]);
+    const y = d3.scaleLinear().domain([0, d3.max(data, d => d.time)!]).range([height, 0]);
 
     g.append('g').attr('transform', `translate(0,${height})`).call(d3.axisBottom(x));
     g.append('g').call(d3.axisLeft(y));
@@ -49,6 +61,15 @@ const GraphTab: React.FC<GraphTabProps> = ({ graphType }) => {
         .attr('stroke', color(`${i}`))
         .attr('stroke-width', 2)
         .attr('d', line);
+
+      g.selectAll(`.dot-${algo}`)
+        .data(algoData)
+        .enter()
+        .append('circle')
+        .attr('cx', d => x(d.nodes))
+        .attr('cy', d => y(d.time))
+        .attr('r', 3)
+        .attr('fill', color(`${i}`));
     });
   }, [data]);
 
