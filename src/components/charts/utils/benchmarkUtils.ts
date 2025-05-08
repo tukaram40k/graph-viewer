@@ -652,43 +652,6 @@ function generatePlanarGraph(
   }
 }
 
-/**
- * Convert a weighted graph to unweighted format for compatibility with algorithms
- * @param weightedGraph The weighted graph to convert
- */
-function weightedToUnweighted(weightedGraph: WeightedGraph): UnweightedGraph {
-  const unweightedGraph: UnweightedGraph = new Map();
-  
-  for (const [node, edges] of weightedGraph.entries()) {
-    unweightedGraph.set(node, edges.map(edge => edge.node));
-  }
-  
-  return unweightedGraph;
-}
-
-/**
- * Helper function to extract unique edge pairs for Kruskal's algorithm
- * @param graph The graph to extract edges from
- */
-function extractEdgePairs(graph: WeightedGraph | UnweightedGraph): [string, string][] {
-  const edges: [string, string][] = [];
-  const visited = new Set<string>();
-  
-  for (const [node, neighbors] of graph.entries()) {
-    for (const neighbor of neighbors) {
-      const nextNode = typeof neighbor === 'string' ? neighbor : neighbor.node;
-      
-      // Create a unique key for this edge to avoid duplicates
-      const edgeKey = [node, nextNode].sort().join('-');
-      if (!visited.has(edgeKey)) {
-        visited.add(edgeKey);
-        edges.push([node, nextNode]);
-      }
-    }
-  }
-  
-  return edges;
-}
 
 /**
  * Main function to generate different types of graphs
@@ -729,37 +692,41 @@ function generateGraph(
 }
 
 // Modified algorithms to work with both weighted and unweighted graphs
-function dfs(graph: WeightedGraph | UnweightedGraph, start: string, visited = new Set<string>()) {
-  visited.add(start);
+function dfs(graph: WeightedGraph | UnweightedGraph, start: string) {
+  const visited = new Set<string>();
+  const stack = [start];
   
-  const neighbors = graph.get(start) || [];
-  for (const neighbor of neighbors) {
-    // Handle both weighted and unweighted graph formats
-    const nextNode = typeof neighbor === 'string' ? neighbor : neighbor.node;
-    if (!visited.has(nextNode)) {
-      dfs(graph, nextNode, visited);
+  while (stack.length) {
+    const node = stack.pop()!;
+    if (!visited.has(node)) {
+      visited.add(node);
+      const neighbors = graph.get(node) || [];
+      // Push in reverse order to maintain same traversal order as recursive
+      for (let i = neighbors.length - 1; i >= 0; i--) {
+        const neighbor = neighbors[i];
+        const nextNode = typeof neighbor === 'string' ? neighbor : neighbor.node;
+        if (!visited.has(nextNode)) {
+          stack.push(nextNode);
+        }
+      }
     }
   }
-  
   return visited;
 }
 
 function bfs(graph: WeightedGraph | UnweightedGraph, start: string) {
   const visited = new Set<string>();
   const queue: string[] = [start];
+  visited.add(start);  // Mark as visited when enqueuing
   
   while (queue.length) {
     const node = queue.shift()!;
-    if (!visited.has(node)) {
-      visited.add(node);
-      
-      const neighbors = graph.get(node) || [];
-      for (const neighbor of neighbors) {
-        // Handle both weighted and unweighted graph formats
-        const nextNode = typeof neighbor === 'string' ? neighbor : neighbor.node;
-        if (!visited.has(nextNode)) {
-          queue.push(nextNode);
-        }
+    const neighbors = graph.get(node) || [];
+    for (const neighbor of neighbors) {
+      const nextNode = typeof neighbor === 'string' ? neighbor : neighbor.node;
+      if (!visited.has(nextNode)) {
+        visited.add(nextNode);
+        queue.push(nextNode);
       }
     }
   }
@@ -953,8 +920,7 @@ export function runAlgorithmsOnGraph(
   graphType: string,
   useWeighted: boolean = true
 ): Array<{ algorithm: string; nodes: number; time: number }> {
-  // Different node counts to test performance
-  const nodeCounts = [10, 50, 100, 200];
+  const nodeCounts = [10, 50, 100, 150, 200, 250];
   const results: Array<{ algorithm: string; nodes: number; time: number }> = [];
   
   for (const n of nodeCounts) {
@@ -1017,8 +983,6 @@ export function runAlgorithmsOnGraph(
   
   return results;
 }
-
-
 
 
 
