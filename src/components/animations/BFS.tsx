@@ -2,34 +2,34 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import '../styles/animations/prim.scss'
-import '../styles/animations/d3.css'
+import '../../styles/animations/bfs.scss'
+import '../../styles/animations/d3.css'
 
 type Props = {
   onBack: () => void;
 };
 
-const Prim: React.FC<Props> = ({ onBack }) => {
+const BFS: React.FC<Props> = ({ onBack }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [status, setStatus] = useState('Ready to start');
   const [running, setRunning] = useState(false);
   const [animationSpeed, setAnimationSpeed] = useState(500);
   const [nodeCount, setNodeCount] = useState(20);
 
-  const title = "Prim's Algorithm";
+  const title = "Breadth-First Search";
 
   // Store references to simulation and animation state
   const simulationRef = useRef(null);
   const animationTimeoutRef = useRef(null);
   const svgRef = useRef(null);
-  const primStateRef = useRef({
-    mst: [], // Edges in the MST
-    inTree: new Set(), // Nodes already in the MST
-    notInTree: new Set(), // Nodes not yet in the MST
-    current: null, // Current node being processed
-    source: null, // Starting node
-    finished: false,
-    totalWeight: 0 // Total weight of the MST
+  const bfsStateRef = useRef({
+    queue: [],
+    visited: new Set(),
+    current: null,
+    source: null,
+    levelMap: {}, // Maps nodes to their BFS level (distance from source)
+    edges: [], // Edges in BFS tree
+    finished: false
   });
   
   const nodesRef = useRef([]);
@@ -37,16 +37,16 @@ const Prim: React.FC<Props> = ({ onBack }) => {
   const nodeElementsRef = useRef(null);
   const linkElementsRef = useRef(null);
   const textElementsRef = useRef(null);
-  const weightElementsRef = useRef(null);
+  const levelTextsRef = useRef(null);
 
   // Constants
   const COLORS = {
-    notInTreeNode: "#48A6A7",
+    unvisitedNode: "#48A6A7",
     currentNode: "#313bc1",
-    inTreeNode: "#6972e9",
-    mstEdge: "#AE445A",
+    visitedNode: "#6972e9",
+    queuedNode: "#6de5a1",
+    bfsEdge: "#AE445A",
     edge: "#48A6A7",
-    candidateEdge: "#6972e9",
     text: "white"
   };
 
@@ -95,16 +95,6 @@ const Prim: React.FC<Props> = ({ onBack }) => {
     
     linkElementsRef.current = linkElements;
     
-    // Create weight labels
-    const weightElements = svg.append("g")
-      .selectAll("text")
-      .data(linksRef.current)
-      .enter().append("text")
-      .attr("class", "weight-label")
-      .text(d => d.weight);
-    
-    weightElementsRef.current = weightElements;
-    
     // Create nodes
     const nodeElements = svg.append("g")
       .selectAll("circle")
@@ -112,7 +102,7 @@ const Prim: React.FC<Props> = ({ onBack }) => {
       .enter().append("circle")
       .attr("class", "node")
       .attr("r", d => d.radius || 15)
-      .attr("fill", d => d.color || COLORS.notInTreeNode)
+      .attr("fill", d => d.color || COLORS.unvisitedNode)
       .attr("stroke", "#2c3e50")
       .attr("stroke-width", 1.5)
       .call(d3.drag()
@@ -136,6 +126,19 @@ const Prim: React.FC<Props> = ({ onBack }) => {
     
     textElementsRef.current = textElements;
     
+    // Create level display texts (will be updated during BFS)
+    const levelTexts = svg.append("g")
+      .selectAll("text.level-label")
+      .data(nodesRef.current)
+      .enter().append("text")
+      .attr("class", "level-label")
+      .attr("fill", "#2c3e50")
+      .attr("font-size", "10px")
+      .attr("text-anchor", "middle")
+      .attr("dy", 25);
+    
+    levelTextsRef.current = levelTexts;
+    
     // Create force simulation
     const simulation = d3.forceSimulation(nodesRef.current)
       .force("link", d3.forceLink(linksRef.current).id(d => d.id).distance(100))
@@ -156,12 +159,6 @@ const Prim: React.FC<Props> = ({ onBack }) => {
       .attr("x2", d => d.target.x)
       .attr("y2", d => d.target.y);
     
-    // Update weight label positions
-    weightElementsRef.current
-      .attr("x", d => (d.source.x + d.target.x) / 2)
-      .attr("y", d => (d.source.y + d.target.y) / 2)
-      .attr("dy", -5);
-    
     // Keep nodes within bounds
     const WIDTH = containerRef.current.clientWidth;
     const HEIGHT = 600;
@@ -172,6 +169,11 @@ const Prim: React.FC<Props> = ({ onBack }) => {
     
     // Update text positions
     textElementsRef.current
+      .attr("x", d => d.x)
+      .attr("y", d => d.y);
+    
+    // Update level text positions
+    levelTextsRef.current
       .attr("x", d => d.x)
       .attr("y", d => d.y);
   };
@@ -211,19 +213,17 @@ const Prim: React.FC<Props> = ({ onBack }) => {
       nodesRef.current.push({
         id: i,
         radius: nodeRadius,
-        color: COLORS.notInTreeNode
+        color: COLORS.unvisitedNode
       });
     }
     
-    // Create edges ensuring the graph is connected
+    // Create a connected graph (using a tree structure)
     for (let i = 1; i < nodeCount; i++) {
       const parent = Math.floor(Math.random() * i);
-      const weight = Math.floor(Math.random() * 9) + 1; // Random weight between 1-9
       
       linksRef.current.push({
         source: parent,
         target: i,
-        weight: weight,
         color: COLORS.edge
       });
     }
@@ -238,11 +238,9 @@ const Prim: React.FC<Props> = ({ onBack }) => {
         
         // Add with probability based on edge density
         if (Math.random() < edgeDensity) {
-          const weight = Math.floor(Math.random() * 9) + 1; // Random weight between 1-9
           linksRef.current.push({
             source: i,
             target: j,
-            weight: weight,
             color: COLORS.edge
           });
         }
@@ -254,22 +252,21 @@ const Prim: React.FC<Props> = ({ onBack }) => {
     resetAlgorithm();
   };
 
-  // Initialize Prim's algorithm
-  const initializePrim = () => {
+  // Initialize BFS algorithm
+  const initializeBFS = () => {
     const state = {
-      mst: [],
-      inTree: new Set(),
-      notInTree: new Set(),
+      queue: [],
+      visited: new Set(),
       current: null,
       source: 0, // Start from node 0
-      finished: false,
-      totalWeight: 0
+      levelMap: {}, // Maps nodes to their BFS level
+      edges: [],
+      finished: false
     };
     
-    // Initialize all nodes as not in tree
+    // Reset all node colors
     nodesRef.current.forEach(node => {
-      state.notInTree.add(node.id);
-      node.color = COLORS.notInTreeNode;
+      node.color = COLORS.unvisitedNode;
     });
     
     // Reset all link colors
@@ -277,12 +274,17 @@ const Prim: React.FC<Props> = ({ onBack }) => {
       link.color = COLORS.edge;
     });
     
-    primStateRef.current = state;
+    // Reset level labels
+    if (levelTextsRef.current) {
+      levelTextsRef.current.text("");
+    }
+    
+    bfsStateRef.current = state;
     
     // Update visualization
     updateVisualization();
     
-    setStatus("Ready");
+    setStatus("Ready to start BFS");
   };
 
   // Reset the algorithm
@@ -291,7 +293,7 @@ const Prim: React.FC<Props> = ({ onBack }) => {
       clearTimeout(animationTimeoutRef.current);
       setRunning(false);
     }
-    initializePrim();
+    initializeBFS();
   };
 
   // Update the visualization based on current state
@@ -303,109 +305,119 @@ const Prim: React.FC<Props> = ({ onBack }) => {
     linkElementsRef.current.attr("stroke", d => d.color);
     
     // Highlight current node with a stroke
-    nodeElementsRef.current.attr("stroke-width", d => d.id === primStateRef.current.current ? 3 : 1.5);
+    nodeElementsRef.current.attr("stroke-width", d => d.id === bfsStateRef.current.current ? 3 : 1.5);
+    
+    // Update level labels
+    levelTextsRef.current.text(d => {
+      const level = bfsStateRef.current.levelMap[d.id];
+      return level !== undefined ? `L${level}` : "";
+    });
   };
 
-  // Get all edges connecting nodes in the tree to nodes not in the tree
-  const getCandidateEdges = () => {
-    const state = primStateRef.current;
-    const candidateEdges = [];
+  // Get neighbors of a node
+  const getNeighbors = (nodeId) => {
+    const neighbors = [];
     
-    // Look through all edges
     linksRef.current.forEach(link => {
       const sourceId = typeof link.source === 'object' ? link.source.id : link.source;
       const targetId = typeof link.target === 'object' ? link.target.id : link.target;
       
-      // If one node is in the tree and the other is not, this is a candidate edge
-      if ((state.inTree.has(sourceId) && state.notInTree.has(targetId)) || 
-          (state.inTree.has(targetId) && state.notInTree.has(sourceId))) {
-        candidateEdges.push({
-          link,
-          weight: link.weight,
-          inTreeNode: state.inTree.has(sourceId) ? sourceId : targetId,
-          notInTreeNode: state.notInTree.has(sourceId) ? sourceId : targetId
-        });
+      if (sourceId === nodeId) {
+        neighbors.push({ id: targetId, link });
+      } else if (targetId === nodeId) {
+        neighbors.push({ id: sourceId, link });
       }
     });
     
-    // Sort by weight ascending
-    return candidateEdges.sort((a, b) => a.weight - b.weight);
+    return neighbors;
   };
 
-  // Perform one step of Prim's algorithm
-  const primStep = () => {
-    const state = primStateRef.current;
+  // Perform one step of BFS algorithm
+  const bfsStep = () => {
+    const state = bfsStateRef.current;
     
     if (state.finished) {
       setRunning(false);
       return;
     }
     
-    // If this is the first step, add the source node to the tree
-    if (state.inTree.size === 0) {
+    // If this is the first step, add the source node to the queue
+    if (state.queue.length === 0 && state.visited.size === 0) {
+      state.queue.push(state.source);
+      state.visited.add(state.source);
+      state.levelMap[state.source] = 0;
+      
       const sourceNode = nodesRef.current.find(n => n.id === state.source);
-      sourceNode.color = COLORS.inTreeNode;
-      state.inTree.add(state.source);
-      state.notInTree.delete(state.source);
+      sourceNode.color = COLORS.currentNode;
       state.current = state.source;
       
-      setStatus(`Starting with node ${state.source}`);
+      setStatus(`Starting BFS from node ${state.source}`);
       updateVisualization();
       
       // Schedule the next step
-      animationTimeoutRef.current = setTimeout(primStep, animationSpeed);
+      animationTimeoutRef.current = setTimeout(() => {
+        sourceNode.color = COLORS.visitedNode;
+        updateVisualization();
+        
+        // Schedule the next step
+        animationTimeoutRef.current = setTimeout(bfsStep, animationSpeed / 2);
+      }, animationSpeed / 2);
+      
       return;
     }
     
-    // Get all candidate edges
-    const candidateEdges = getCandidateEdges();
-    
-    // If no candidate edges, we're done
-    if (candidateEdges.length === 0) {
+    // If queue is empty, BFS is done
+    if (state.queue.length === 0) {
       state.finished = true;
-      setStatus(`MST found. Weight: ${state.totalWeight}`);
+      setStatus("BFS traversal complete");
       setRunning(false);
       return;
     }
     
-    // Get the minimum weight edge
-    const minEdge = candidateEdges[0];
-    const newNode = minEdge.notInTreeNode;
+    // Dequeue the next node
+    const current = state.queue.shift();
+    state.current = current;
     
-    // Highlight the edge and nodes
-    minEdge.link.color = COLORS.mstEdge;
-    const newNodeObj = nodesRef.current.find(n => n.id === newNode);
-    newNodeObj.color = COLORS.currentNode;
-    state.current = newNode;
+    const currentNode = nodesRef.current.find(n => n.id === current);
+    currentNode.color = COLORS.currentNode;
     
-    // Add to MST
-    state.mst.push(minEdge.link);
-    state.totalWeight += minEdge.weight;
+    const currentLevel = state.levelMap[current];
+    setStatus(`Processing node ${current} (Level ${currentLevel})`);
     
-    setStatus(`Adding edge (${minEdge.inTreeNode}-${newNode}). Weight: ${state.totalWeight}`);
+    // Get neighbors of the current node
+    const neighbors = getNeighbors(current);
+    
+    // Process neighbors - add unvisited neighbors to queue
+    const unvisitedNeighbors = neighbors.filter(n => !state.visited.has(n.id));
     
     updateVisualization();
     
-    // Schedule next part
+    // Schedule the next step - process the neighbors
     animationTimeoutRef.current = setTimeout(() => {
-      // Mark the new node as in the tree
-      state.inTree.add(newNode);
-      state.notInTree.delete(newNode);
-      newNodeObj.color = COLORS.inTreeNode;
+      // For each unvisited neighbor
+      unvisitedNeighbors.forEach(neighbor => {
+        // Add to queue and mark as visited
+        state.queue.push(neighbor.id);
+        state.visited.add(neighbor.id);
+        state.levelMap[neighbor.id] = currentLevel + 1;
+        
+        // Update neighbor node color to queued
+        const neighborNode = nodesRef.current.find(n => n.id === neighbor.id);
+        neighborNode.color = COLORS.queuedNode;
+        
+        // Add edge to BFS tree
+        state.edges.push(neighbor.link);
+        neighbor.link.color = COLORS.bfsEdge;
+      });
+      
+      // Update current node color to visited
+      currentNode.color = COLORS.visitedNode;
       
       updateVisualization();
       
-      // Check if MST is complete
-      if (state.inTree.size === nodesRef.current.length) {
-        state.finished = true;
-        setStatus(`MST found. Weight: ${state.totalWeight}`);
-        setRunning(false);
-        return;
-      }
-      
       // Schedule the next step
-      animationTimeoutRef.current = setTimeout(primStep, animationSpeed / 2);
-    }, animationSpeed / 2);
+      animationTimeoutRef.current = setTimeout(bfsStep, animationSpeed);
+    }, animationSpeed);
   };
 
   // Toggle algorithm running
@@ -414,11 +426,11 @@ const Prim: React.FC<Props> = ({ onBack }) => {
       clearTimeout(animationTimeoutRef.current);
       setRunning(false);
     } else {
-      if (primStateRef.current.finished) {
+      if (bfsStateRef.current.finished) {
         resetAlgorithm();
       }
       setRunning(true);
-      primStep();
+      bfsStep();
     }
   };
 
@@ -435,7 +447,7 @@ const Prim: React.FC<Props> = ({ onBack }) => {
   };
 
   return (
-    <div className="prim-container">
+    <div className="bfs-container">
       <button className="back-button" onClick={onBack}>Back</button>
       <h2>{title} Animation</h2>
       <div className="animation-ui">
@@ -465,7 +477,11 @@ const Prim: React.FC<Props> = ({ onBack }) => {
           <div className="legend">
             <div className="legend-item">
               <div className="color-box unvisited"></div>
-              <span>Not in MST</span>
+              <span>Unvisited Node</span>
+            </div>
+            <div className="legend-item">
+              <div className="color-box queued"></div>
+              <span>Queued Node</span>
             </div>
             <div className="legend-item">
               <div className="color-box current"></div>
@@ -473,11 +489,11 @@ const Prim: React.FC<Props> = ({ onBack }) => {
             </div>
             <div className="legend-item">
               <div className="color-box visited"></div>
-              <span>In MST</span>
+              <span>Visited Node</span>
             </div>
             <div className="legend-item">
-              <div className="color-box path"></div>
-              <span>MST Edge</span>
+              <div className="color-box bfs-edge"></div>
+              <span>BFS Tree Edge</span>
             </div>
           </div>
         </div>
@@ -489,4 +505,4 @@ const Prim: React.FC<Props> = ({ onBack }) => {
   );
 };
 
-export default Prim;
+export default BFS;

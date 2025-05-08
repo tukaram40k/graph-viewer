@@ -1,9 +1,7 @@
-// @ts-nocheck
-
 import React, { useState } from 'react';
-import { graphTypes } from './data/graphTypes';
+import { graphTypes } from './utils/graphTypes';
 import GraphTab from './GraphTab';
-import './styles/BenchmarkSection.scss';
+import '../../styles/components/_benchmark-section.scss';
 
 const BenchmarkSection: React.FC = () => {
   const [activeTab, setActiveTab] = useState(graphTypes[0]);

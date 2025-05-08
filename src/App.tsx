@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import Header from './components/Header';
-import GraphArea from './components/GraphArea';
+import Header from './components/animations/Header';
+import GraphArea from './components/animations/GraphArea';
 import BenchmarkSection from './components/charts/BenchmarkSection';
 
 const App: React.FC = () => {

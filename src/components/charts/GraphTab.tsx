@@ -70,7 +70,7 @@ const GraphTab: React.FC<GraphTabProps> = ({ graphType }) => {
         .x(d => x(d.nodes))
         .y(d => y(d.time));
 
-      group.algorithms.forEach((algo, i) => {
+      group.algorithms.forEach((algo) => {
         const algoData = groupData.filter(d => d.algorithm === algo);
         g.append('path')
           .datum(algoData)

@@ -2,8 +2,8 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import * as d3 from 'd3';
-import '../styles/animations/dijkstra.scss'
-import '../styles/animations/d3.css'
+import '../../styles/animations/dijkstra.scss'
+import '../../styles/animations/d3.css'
 
 type Props = {
   onBack: () => void;
