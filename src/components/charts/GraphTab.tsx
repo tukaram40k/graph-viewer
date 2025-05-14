@@ -40,15 +40,15 @@ const GraphTab: React.FC<GraphTabProps> = ({ graphType }) => {
     ];
 
     const container = d3.select('#chart');
-    const width = 600;
-    const height = 300;
-    const margin = { top: 20, right: 30, bottom: 30, left: 40 };
+    const width = 900;
+    const height = 450;
+    const margin = { top: 50, right: 50, bottom: 80, left: 80 }; // Increased bottom and left margins for larger labels
 
     const color = d3.scaleOrdinal(d3.schemeCategory10);
 
     groups.forEach((group, index) => {
       const chartId = `chart-${index}`;
-      container.append('div').attr('id', chartId).style('margin-bottom', '2rem');
+      container.append('div').attr('id', chartId).style('margin-bottom', '3rem');
 
       const svg = d3.select(`#${chartId}`)
         .append('svg')
@@ -63,8 +63,33 @@ const GraphTab: React.FC<GraphTabProps> = ({ graphType }) => {
       const x = d3.scaleLinear().domain([0, d3.max(groupData, d => d.nodes)!]).range([0, chartWidth]);
       const y = d3.scaleLinear().domain([0, d3.max(groupData, d => d.time)!]).range([chartHeight, 0]);
 
-      g.append('g').attr('transform', `translate(0,${chartHeight})`).call(d3.axisBottom(x));
-      g.append('g').call(d3.axisLeft(y));
+      // X-axis with larger label
+      g.append('g')
+        .attr('transform', `translate(0,${chartHeight})`)
+        .call(d3.axisBottom(x).tickSizeOuter(0))
+        .style('font-size', '14px') // Increased tick label size
+        .append('text')
+        .attr('x', chartWidth / 2)
+        .attr('y', 45) // Increased from 35
+        .attr('fill', '#000')
+        .attr('text-anchor', 'middle')
+        .style('font-size', '16px') // Increased axis label size
+        .style('font-weight', 'bold')
+        .text('Number of Nodes');
+
+      // Y-axis with larger label
+      g.append('g')
+        .call(d3.axisLeft(y).tickSizeOuter(0))
+        .style('font-size', '14px') // Increased tick label size
+        .append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('y', -50) // Increased from -40
+        .attr('x', -chartHeight / 2)
+        .attr('fill', '#000')
+        .attr('text-anchor', 'middle')
+        .style('font-size', '16px') // Increased axis label size
+        .style('font-weight', 'bold')
+        .text('Time (ms)');
 
       const line = d3.line<any>()
         .x(d => x(d.nodes))
@@ -85,31 +110,31 @@ const GraphTab: React.FC<GraphTabProps> = ({ graphType }) => {
           .append('circle')
           .attr('cx', d => x(d.nodes))
           .attr('cy', d => y(d.time))
-          .attr('r', 3)
+          .attr('r', 4.5)
           .attr('fill', color(algo));
       });
 
       // Add legend
       const legend = svg.append('g')
-        .attr('transform', `translate(${width - 100}, 20)`);
+        .attr('transform', `translate(${width - 150}, 30)`);
 
       group.algorithms.forEach((algo, i) => {
-        const legendRow = legend.append('g').attr('transform', `translate(0, ${i * 20})`);
-        legendRow.append('rect').attr('width', 10).attr('height', 10).attr('fill', color(algo));
+        const legendRow = legend.append('g').attr('transform', `translate(0, ${i * 24})`);
+        legendRow.append('rect').attr('width', 15).attr('height', 15).attr('fill', color(algo));
         legendRow.append('text')
-          .attr('x', 15)
-          .attr('y', 10)
+          .attr('x', 20)
+          .attr('y', 12)
           .text(algo)
-          .attr('font-size', '12px')
+          .attr('font-size', '14px')
           .attr('fill', '#000');
       });
 
       // Add title
       svg.append('text')
         .attr('x', width / 2)
-        .attr('y', 16)
+        .attr('y', 24)
         .attr('text-anchor', 'middle')
-        .attr('font-size', '16px')
+        .attr('font-size', '20px')
         .text(group.title);
     });
   }, [data]);
