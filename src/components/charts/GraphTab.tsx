@@ -34,9 +34,9 @@ const GraphTab: React.FC<GraphTabProps> = ({ graphType }) => {
     d3.select('#chart').selectAll('*').remove();
 
     const groups = [
-      { title: 'DFS + BFS', algorithms: ['DFS', 'BFS'] },
-      { title: 'Prim + Kruskal', algorithms: ['Prim', 'Kruskal'] },
-      { title: 'Dijkstra + FloydWarshall', algorithms: ['Dijkstra', 'Floyd-Warshall'] },
+      { title: 'DFS and BFS', algorithms: ['DFS', 'BFS'] },
+      { title: 'Prim and Kruskal', algorithms: ['Prim', 'Kruskal'] },
+      { title: 'Dijkstra and FloydWarshall', algorithms: ['Dijkstra', 'Floyd-Warshall'] },
     ];
 
     const container = d3.select('#chart');
@@ -48,7 +48,7 @@ const GraphTab: React.FC<GraphTabProps> = ({ graphType }) => {
 
     groups.forEach((group, index) => {
       const chartId = `chart-${index}`;
-      container.append('div').attr('id', chartId).style('margin-bottom', '3rem');
+      container.append('div').attr('id', chartId).attr('class', 'svg-holder');
 
       const svg = d3.select(`#${chartId}`)
         .append('svg')
@@ -142,7 +142,9 @@ const GraphTab: React.FC<GraphTabProps> = ({ graphType }) => {
   return (
     <div>
       <h2>{graphType} Graph</h2>
-      <div id="chart"></div>
+      <div id="chart-wrapper">
+        <div id="chart"></div>
+      </div>
     </div>
   );
 };
